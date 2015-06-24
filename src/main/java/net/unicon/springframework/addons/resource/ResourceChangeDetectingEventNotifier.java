@@ -1,5 +1,6 @@
 package net.unicon.springframework.addons.resource;
 
+import java.io.FileWriter;
 import java.net.URI;
 
 import org.apache.shiro.crypto.hash.Sha1Hash;
