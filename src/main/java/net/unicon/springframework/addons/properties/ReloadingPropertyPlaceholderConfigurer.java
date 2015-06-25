@@ -14,6 +14,7 @@ import org.springframework.beans.factory.config.BeanDefinitionVisitor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
@@ -26,7 +27,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-public class ReloadingPropertyPlaceholderConfigurer extends DefaultPropertyPlaceholderConfigurer
+public class ReloadingPropertyPlaceholderConfigurer extends PropertySourcesPlaceholderConfigurer
         implements InitializingBean, DisposableBean, ReloadablePropertiesListener, ApplicationContextAware {
     /**
      * Default reloading placeholder prefix: "#{"
@@ -50,31 +51,31 @@ public class ReloadingPropertyPlaceholderConfigurer extends DefaultPropertyPlace
     private BeanFactory beanFactory;
     private Properties[] propertiesArray;
 
-    public void setProperties(Properties properties) {
+    public void setProperties(final Properties properties) {
         setPropertiesArray(new Properties[]{properties});
     }
 
-    public void setPropertiesArray(Properties[] propertiesArray) {
+    public void setPropertiesArray(final Properties[] propertiesArray) {
         this.propertiesArray = propertiesArray;
         super.setPropertiesArray(propertiesArray);
     }
 
-    public void setPlaceholderPrefix(String placeholderPrefix) {
+    public void setPlaceholderPrefix(final String placeholderPrefix) {
         this.placeholderPrefix = placeholderPrefix;
         super.setPlaceholderPrefix(placeholderPrefix);
     }
 
-    public void setPlaceholderSuffix(String placeholderSuffix) {
+    public void setPlaceholderSuffix(final String placeholderSuffix) {
         this.placeholderSuffix = placeholderSuffix;
         super.setPlaceholderSuffix(placeholderPrefix);
     }
 
-    public void setBeanName(String beanName) {
+    public void setBeanName(final String beanName) {
         this.beanName = beanName;
         super.setBeanName(beanName);
     }
 
-    public void setBeanFactory(BeanFactory beanFactory) {
+    public void setBeanFactory(final BeanFactory beanFactory) {
         this.beanFactory = beanFactory;
         super.setBeanFactory(beanFactory);
     }
@@ -86,7 +87,7 @@ public class ReloadingPropertyPlaceholderConfigurer extends DefaultPropertyPlace
      */
     private ApplicationContext applicationContext;
 
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
 
@@ -94,25 +95,25 @@ public class ReloadingPropertyPlaceholderConfigurer extends DefaultPropertyPlace
 
     private String reloadingPlaceholderSuffix = ReloadingPropertyPlaceholderConfigurer.DEFAULT_RELOADING_PLACEHOLDER_SUFFIX;
 
-    public void setReloadingPlaceholderPrefix(String reloadingPlaceholderPrefix) {
+    public void setReloadingPlaceholderPrefix(final String reloadingPlaceholderPrefix) {
         this.reloadingPlaceholderPrefix = reloadingPlaceholderPrefix;
     }
 
-    public void setReloadingPlaceholderSuffix(String reloadingPlaceholderSuffix) {
+    public void setReloadingPlaceholderSuffix(final String reloadingPlaceholderSuffix) {
         this.reloadingPlaceholderSuffix = reloadingPlaceholderSuffix;
     }
 
-    protected String parseStringValue(String strVal, Properties props, Set visitedPlaceholders)
+    protected String parseStringValue(final String strVal, final Properties props, final Set visitedPlaceholders)
             throws BeanDefinitionStoreException {
 
         DynamicProperty dynamic = null;
 
         // replace reloading prefix and suffix by "normal" prefix and suffix.
         // remember all the "dynamic" placeholders encountered.
-        StringBuffer buf = new StringBuffer(strVal);
+        final StringBuffer buf = new StringBuffer(strVal);
         int startIndex = strVal.indexOf(this.reloadingPlaceholderPrefix);
         while (startIndex != -1) {
-            int endIndex = buf.toString().indexOf(
+            final int endIndex = buf.toString().indexOf(
                     this.reloadingPlaceholderSuffix, startIndex + this.reloadingPlaceholderPrefix.length());
             if (endIndex != -1) {
                 if (currentBeanName != null && currentPropertyName != null) {
@@ -138,9 +139,9 @@ public class ReloadingPropertyPlaceholderConfigurer extends DefaultPropertyPlace
                 visitedPlaceholders);
     }
 
-    private DynamicProperty getDynamic(String currentBeanName, String currentPropertyName, String orgStrVal) {
-        DynamicProperty dynamic = new DynamicProperty(currentBeanName, currentPropertyName, orgStrVal);
-        DynamicProperty found = (DynamicProperty) dynamicProperties.get(dynamic);
+    private DynamicProperty getDynamic(final String currentBeanName, final String currentPropertyName, final String orgStrVal) {
+        final DynamicProperty dynamic = new DynamicProperty(currentBeanName, currentPropertyName, orgStrVal);
+        final DynamicProperty found = (DynamicProperty) dynamicProperties.get(dynamic);
         if (found != null)
             return found;
         dynamicProperties.put(dynamic, dynamic);
@@ -150,35 +151,35 @@ public class ReloadingPropertyPlaceholderConfigurer extends DefaultPropertyPlace
     private Properties lastMergedProperties;
 
     protected Properties mergeProperties() throws IOException {
-        Properties properties = super.mergeProperties();
+        final Properties properties = super.mergeProperties();
         this.lastMergedProperties = properties;
         return properties;
     }
 
-    public void propertiesReloaded(PropertiesReloadedEvent event) {
-        Properties oldProperties = lastMergedProperties;
+    public void propertiesReloaded(final PropertiesReloadedEvent event) {
+        final Properties oldProperties = lastMergedProperties;
         try {
-            Properties newProperties = mergeProperties();
+            final Properties newProperties = mergeProperties();
 
             // determine which relevant net.unicon.iamlabs.spring.properties.example.net.unicon.iamlabs.spring.properties have changed.
-            Set<String> placeholders = placeholderToDynamics.keySet();
-            Set<DynamicProperty> allDynamics = new HashSet<DynamicProperty>();
-            for (String placeholder : placeholders) {
-                String newValue = newProperties.getProperty(placeholder);
-                String oldValue = oldProperties.getProperty(placeholder);
+            final Set<String> placeholders = placeholderToDynamics.keySet();
+            final Set<DynamicProperty> allDynamics = new HashSet<DynamicProperty>();
+            for (final String placeholder : placeholders) {
+                final String newValue = newProperties.getProperty(placeholder);
+                final String oldValue = oldProperties.getProperty(placeholder);
                 if (newValue != null && !newValue.equals(oldValue)
                         || newValue == null && oldValue != null) {
                     if (logger.isInfoEnabled())
                         logger.info("Property changed detected: " + placeholder + (newValue != null ? "=" + newValue : " removed"));
-                    List<DynamicProperty> affectedDynamics = placeholderToDynamics.get(placeholder);
+                    final List<DynamicProperty> affectedDynamics = placeholderToDynamics.get(placeholder);
                     allDynamics.addAll(affectedDynamics);
                 }
             }
             // sort affected bean net.unicon.iamlabs.spring.properties.example.net.unicon.iamlabs.spring.properties by bean name and say hello.
-            Map<String, List<DynamicProperty>> dynamicsByBeanName = new HashMap<String, List<DynamicProperty>>();
-            Map<String, Object> beanByBeanName = new HashMap<String, Object>();
-            for (DynamicProperty dynamic : allDynamics) {
-                String beanName = dynamic.getBeanName();
+            final Map<String, List<DynamicProperty>> dynamicsByBeanName = new HashMap<String, List<DynamicProperty>>();
+            final Map<String, Object> beanByBeanName = new HashMap<String, Object>();
+            for (final DynamicProperty dynamic : allDynamics) {
+                final String beanName = dynamic.getBeanName();
                 List<DynamicProperty> l = dynamicsByBeanName.get(beanName);
                 if (l == null) {
                     dynamicsByBeanName.put(beanName, (l = new ArrayList<DynamicProperty>()));
@@ -186,31 +187,31 @@ public class ReloadingPropertyPlaceholderConfigurer extends DefaultPropertyPlace
                     try {
                         bean = applicationContext.getBean(beanName);
                         beanByBeanName.put(beanName, bean);
-                    } catch (BeansException e) {
+                    } catch (final BeansException e) {
                         // keep dynamicsByBeanName list, warn only once.
                         logger.error("Error obtaining bean " + beanName, e);
                     }
                     try {
                         if (bean instanceof ReconfigurationAware)
                             ((ReconfigurationAware) bean).beforeReconfiguration();  // hello!
-                    } catch (Exception e) {
+                    } catch (final Exception e) {
                         logger.error("Error calling beforeReconfiguration on " + beanName, e);
                     }
                 }
                 l.add(dynamic);
             }
             // for all affected beans...
-            Collection<String> beanNames = dynamicsByBeanName.keySet();
-            for (String beanName : beanNames) {
-                Object bean = beanByBeanName.get(beanName);
+            final Collection<String> beanNames = dynamicsByBeanName.keySet();
+            for (final String beanName : beanNames) {
+                final Object bean = beanByBeanName.get(beanName);
                 if (bean == null) // problems obtaining bean, earlier
                     continue;
-                BeanWrapper beanWrapper = new BeanWrapperImpl(bean);
+                final BeanWrapper beanWrapper = new BeanWrapperImpl(bean);
                 // for all affected net.unicon.iamlabs.spring.properties.example.net.unicon.iamlabs.spring.properties...
-                List<DynamicProperty> dynamics = dynamicsByBeanName.get(beanName);
-                for (DynamicProperty dynamic : dynamics) {
-                    String propertyName = dynamic.getPropertyName();
-                    String unparsedValue = dynamic.getUnparsedValue();
+                final List<DynamicProperty> dynamics = dynamicsByBeanName.get(beanName);
+                for (final DynamicProperty dynamic : dynamics) {
+                    final String propertyName = dynamic.getPropertyName();
+                    final String unparsedValue = dynamic.getUnparsedValue();
 
                     // obtain an updated value, including dependencies
                     String newValue;
@@ -229,22 +230,22 @@ public class ReloadingPropertyPlaceholderConfigurer extends DefaultPropertyPlace
                     // assign it to the bean
                     try {
                         beanWrapper.setPropertyValue(propertyName, newValue);
-                    } catch (BeansException e) {
+                    } catch (final BeansException e) {
                         logger.error("Error setting property " + beanName + "." + propertyName + " to " + newValue, e);
                     }
                 }
             }
             // say goodbye.
-            for (String beanName : beanNames) {
-                Object bean = beanByBeanName.get(beanName);
+            for (final String beanName : beanNames) {
+                final Object bean = beanByBeanName.get(beanName);
                 try {
                     if (bean instanceof ReconfigurationAware)
                         ((ReconfigurationAware) bean).afterReconfiguration();
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     logger.error("Error calling afterReconfiguration on " + beanName, e);
                 }
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             logger.error("Error trying to reload net.unicon.iamlabs.spring.properties.example.net.unicon.iamlabs.spring.properties: " + e.getMessage(), e);
         }
     }
@@ -255,13 +256,13 @@ public class ReloadingPropertyPlaceholderConfigurer extends DefaultPropertyPlace
         final String unparsedValue;
         List<String> placeholders = new ArrayList<String>();
 
-        public DynamicProperty(String beanName, String propertyName, String unparsedValue) {
+        public DynamicProperty(final String beanName, final String propertyName, final String unparsedValue) {
             this.beanName = beanName;
             this.propertyName = propertyName;
             this.unparsedValue = unparsedValue;
         }
 
-        public void addPlaceholder(String placeholder) {
+        public void addPlaceholder(final String placeholder) {
             placeholders.add(placeholder);
         }
 
@@ -277,7 +278,7 @@ public class ReloadingPropertyPlaceholderConfigurer extends DefaultPropertyPlace
             return propertyName;
         }
 
-        public boolean equals(Object o) {
+        public boolean equals(final Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
 
@@ -301,7 +302,7 @@ public class ReloadingPropertyPlaceholderConfigurer extends DefaultPropertyPlace
     private Map<DynamicProperty, DynamicProperty> dynamicProperties = new HashMap<DynamicProperty, DynamicProperty>();
     private Map<String, List<DynamicProperty>> placeholderToDynamics = new HashMap<String, List<DynamicProperty>>();
 
-    private void addDependency(DynamicProperty dynamic, String placeholder) {
+    private void addDependency(final DynamicProperty dynamic, final String placeholder) {
         List<DynamicProperty> l = placeholderToDynamics.get(placeholder);
         if (l == null) {
             l = new ArrayList<DynamicProperty>();
@@ -312,10 +313,10 @@ public class ReloadingPropertyPlaceholderConfigurer extends DefaultPropertyPlace
         dynamic.addPlaceholder(placeholder);
     }
 
-    private void removeDynamic(DynamicProperty dynamic) {
-        List<String> placeholders = dynamic.placeholders;
-        for (String placeholder : placeholders) {
-            List<DynamicProperty> l = placeholderToDynamics.get(placeholder);
+    private void removeDynamic(final DynamicProperty dynamic) {
+        final List<String> placeholders = dynamic.placeholders;
+        for (final String placeholder : placeholders) {
+            final List<DynamicProperty> l = placeholderToDynamics.get(placeholder);
             l.remove(dynamic);
         }
         dynamic.placeholders.clear();
@@ -328,21 +329,21 @@ public class ReloadingPropertyPlaceholderConfigurer extends DefaultPropertyPlace
     /**
      * copy & paste, just so we can insert our own visitor.
      */
-    protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, Properties props)
+    protected void processProperties(final ConfigurableListableBeanFactory beanFactoryToProcess, final Properties props)
             throws BeansException {
 
-        BeanDefinitionVisitor visitor = new ReloadingPropertyPlaceholderConfigurer.PlaceholderResolvingBeanDefinitionVisitor(props);
-        String[] beanNames = beanFactoryToProcess.getBeanDefinitionNames();
+        final BeanDefinitionVisitor visitor = new ReloadingPropertyPlaceholderConfigurer.PlaceholderResolvingBeanDefinitionVisitor(props);
+        final String[] beanNames = beanFactoryToProcess.getBeanDefinitionNames();
         for (int i = 0; i < beanNames.length; i++) {
             // Check that we're not parsing our own bean definition,
             // to avoid failing on unresolvable placeholders in net.unicon.iamlabs.spring.properties.example.net.unicon.iamlabs.spring.properties file locations.
             if (!(beanNames[i].equals(this.beanName) && beanFactoryToProcess.equals(this.beanFactory))) {
                 this.currentBeanName = beanNames[i];
                 try {
-                    BeanDefinition bd = beanFactoryToProcess.getBeanDefinition(beanNames[i]);
+                    final BeanDefinition bd = beanFactoryToProcess.getBeanDefinition(beanNames[i]);
                     try {
                         visitor.visitBeanDefinition(bd);
-                    } catch (BeanDefinitionStoreException ex) {
+                    } catch (final BeanDefinitionStoreException ex) {
                         throw new BeanDefinitionStoreException(bd.getResourceDescription(), beanNames[i], ex.getMessage());
                     }
                 } finally {
@@ -353,7 +354,7 @@ public class ReloadingPropertyPlaceholderConfigurer extends DefaultPropertyPlace
     }
 
     public void afterPropertiesSet() {
-        for (Properties properties : propertiesArray) {
+        for (final Properties properties : propertiesArray) {
             if (properties instanceof ReloadableProperties) {
                 ((ReloadableProperties) properties).addReloadablePropertiesListener(this);
             }
@@ -361,7 +362,7 @@ public class ReloadingPropertyPlaceholderConfigurer extends DefaultPropertyPlace
     }
 
     public void destroy() throws Exception {
-        for (Properties properties : propertiesArray) {
+        for (final Properties properties : propertiesArray) {
             if (properties instanceof ReloadableProperties) {
                 ((ReloadableProperties) properties).removeReloadablePropertiesListener(this);
             }
@@ -372,16 +373,16 @@ public class ReloadingPropertyPlaceholderConfigurer extends DefaultPropertyPlace
 
         private final Properties props;
 
-        public PlaceholderResolvingBeanDefinitionVisitor(Properties props) {
+        public PlaceholderResolvingBeanDefinitionVisitor(final Properties props) {
             this.props = props;
         }
 
-        protected void visitPropertyValues(MutablePropertyValues pvs) {
-            PropertyValue[] pvArray = pvs.getPropertyValues();
-            for (PropertyValue pv : pvArray) {
+        protected void visitPropertyValues(final MutablePropertyValues pvs) {
+            final PropertyValue[] pvArray = pvs.getPropertyValues();
+            for (final PropertyValue pv : pvArray) {
                 currentPropertyName = pv.getName();
                 try {
-                    Object newVal = resolveValue(pv.getValue());
+                    final Object newVal = resolveValue(pv.getValue());
                     if (!ObjectUtils.nullSafeEquals(newVal, pv.getValue())) {
                         pvs.addPropertyValue(pv.getName(), newVal);
                     }
@@ -391,7 +392,7 @@ public class ReloadingPropertyPlaceholderConfigurer extends DefaultPropertyPlace
             }
         }
 
-        protected String resolveStringValue(String strVal) throws BeansException {
+        protected String resolveStringValue(final String strVal) throws BeansException {
             return parseStringValue(strVal, this.props, new HashSet());
         }
     }

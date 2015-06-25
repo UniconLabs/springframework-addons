@@ -27,12 +27,12 @@ public class ResourceNamespaceHandler extends NamespaceHandlerSupport {
     private static class ResourceChangeDetectingEventNotifierBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
         @Override
-        protected Class<?> getBeanClass(Element element) {
+        protected Class<?> getBeanClass(final Element element) {
             return ResourceChangeDetectingEventNotifier.class;
         }
 
         @Override
-        protected void doParse(Element element, BeanDefinitionBuilder builder) {
+        protected void doParse(final Element element, final BeanDefinitionBuilder builder) {
             builder.addConstructorArgValue(element.getAttribute("watched-resource"));
         }
     }

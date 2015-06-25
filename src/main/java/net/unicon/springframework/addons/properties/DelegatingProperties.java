@@ -18,15 +18,15 @@ import java.util.Set;
 public abstract class DelegatingProperties extends Properties {
     protected abstract Properties getDelegate();
 
-    public void load(InputStream inStream) throws IOException {
+    public void load(final InputStream inStream) throws IOException {
         getDelegate().load(inStream);
     }
 
-    public void list(PrintStream out) {
+    public void list(final PrintStream out) {
         getDelegate().list(out);
     }
 
-    public void list(PrintWriter out) {
+    public void list(final PrintWriter out) {
         getDelegate().list(out);
     }
 
@@ -34,23 +34,23 @@ public abstract class DelegatingProperties extends Properties {
         return getDelegate().propertyNames();
     }
 
-    public void save(OutputStream out, String header) {
+    public void save(final OutputStream out, final String header) {
         getDelegate().save(out, header);
     }
 
-    public void store(OutputStream out, String header) throws IOException {
+    public void store(final OutputStream out, final String header) throws IOException {
         getDelegate().store(out, header);
     }
 
-    public String getProperty(String key) {
+    public String getProperty(final String key) {
         return getDelegate().getProperty(key);
     }
 
-    public Object setProperty(String key, String value) {
+    public Object setProperty(final String key, final String value) {
         return getDelegate().setProperty(key, value);
     }
 
-    public String getProperty(String key, String defaultValue) {
+    public String getProperty(final String key, final String defaultValue) {
         return getDelegate().getProperty(key, defaultValue);
     }
 
@@ -74,19 +74,19 @@ public abstract class DelegatingProperties extends Properties {
         return getDelegate().clone();
     }
 
-    public boolean contains(Object value) {
+    public boolean contains(final Object value) {
         return getDelegate().contains(value);
     }
 
-    public boolean containsKey(Object key) {
+    public boolean containsKey(final Object key) {
         return getDelegate().containsKey(key);
     }
 
-    public boolean containsValue(Object value) {
+    public boolean containsValue(final Object value) {
         return getDelegate().containsValue(value);
     }
 
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         return getDelegate().equals(o);
     }
 
@@ -106,7 +106,7 @@ public abstract class DelegatingProperties extends Properties {
         return getDelegate().keys();
     }
 
-    public void putAll(Map t) {
+    public void putAll(final Map t) {
         getDelegate().putAll(t);
     }
 
@@ -118,15 +118,15 @@ public abstract class DelegatingProperties extends Properties {
         return getDelegate().keySet();
     }
 
-    public Object get(Object key) {
+    public Object get(final Object key) {
         return getDelegate().get(key);
     }
 
-    public Object remove(Object key) {
+    public Object remove(final Object key) {
         return getDelegate().remove(key);
     }
 
-    public Object put(Object key, Object value) {
+    public Object put(final Object key, final Object value) {
         return getDelegate().put(key, value);
     }
 }

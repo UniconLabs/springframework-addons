@@ -6,7 +6,7 @@ public class PropertiesReloadedEvent {
     final ReloadableProperties target;
     final Properties oldProperties;
 
-    public PropertiesReloadedEvent(ReloadableProperties target, Properties oldProperties) {
+    public PropertiesReloadedEvent(final ReloadableProperties target, final Properties oldProperties) {
         this.target = target;
         this.oldProperties = oldProperties;
     }

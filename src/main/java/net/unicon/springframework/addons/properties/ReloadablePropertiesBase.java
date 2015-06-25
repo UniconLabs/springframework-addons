@@ -11,7 +11,7 @@ public class ReloadablePropertiesBase extends DelegatingProperties implements Re
     private List<ReloadablePropertiesListener> listeners = new ArrayList<ReloadablePropertiesListener>();
     private Properties internalProperties;
 
-    public void setListeners(List listeners) {
+    public void setListeners(final List listeners) {
         this.listeners = listeners;
     }
 
@@ -25,23 +25,23 @@ public class ReloadablePropertiesBase extends DelegatingProperties implements Re
         return getDelegate();
     }
 
-    public void addReloadablePropertiesListener(ReloadablePropertiesListener l) {
+    public void addReloadablePropertiesListener(final ReloadablePropertiesListener l) {
         listeners.add(l);
     }
 
-    public boolean removeReloadablePropertiesListener(ReloadablePropertiesListener l) {
+    public boolean removeReloadablePropertiesListener(final ReloadablePropertiesListener l) {
         return listeners.remove(l);
     }
 
-    protected void notifyPropertiesChanged(Properties oldProperties) {
-        PropertiesReloadedEvent event = new PropertiesReloadedEvent(this, oldProperties);
-        for (ReloadablePropertiesListener listener : listeners) {
+    protected void notifyPropertiesChanged(final Properties oldProperties) {
+        final PropertiesReloadedEvent event = new PropertiesReloadedEvent(this, oldProperties);
+        for (final ReloadablePropertiesListener listener : listeners) {
             listener.propertiesReloaded(event);
         }
     }
 
-    protected void setProperties(Properties properties) {
-        Properties oldProperties = internalProperties;
+    protected void setProperties(final Properties properties) {
+        final Properties oldProperties = internalProperties;
         synchronized (this) {
             internalProperties = properties;
         }

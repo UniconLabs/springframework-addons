@@ -40,7 +40,7 @@ public class ReloadablePropertiesFactoryBean extends PropertiesFactoryBean imple
     public void setListeners(final List listeners) {
         // early type check, and avoid aliassing
         this.preListeners = new ArrayList<ReloadablePropertiesListener>();
-        for (Object o : listeners) {
+        for (final Object o : listeners) {
             preListeners.add((ReloadablePropertiesListener) o);
         }
     }
@@ -65,21 +65,21 @@ public class ReloadablePropertiesFactoryBean extends PropertiesFactoryBean imple
     protected void reload(final boolean forceReload) throws IOException {
         boolean reload = forceReload;
         for (int i = 0; i < locations.length; i++) {
-            Resource location = locations[i];
-            File file;
+            final Resource location = locations[i];
+            final File file;
             try {
                 file = location.getFile();
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 // not a file resource
                 continue;
             }
             try {
-                long l = file.lastModified();
+                final long l = file.lastModified();
                 if (l > lastModified[i]) {
                     lastModified[i] = l;
                     reload = true;
                 }
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // cannot access file. assume unchanged.
                 if (log.isDebugEnabled())
                     log.debug("can't determine modification time of " + file + " for " + location, e);
